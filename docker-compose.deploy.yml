@@ -2,23 +2,6 @@
 # Internal Docker Compose Image used for internal testing deployments
 
 services:
-  hoppscotch-db:
-    image: postgres:15
-    user: postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: hoppscotch
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "sh -c 'pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}'"
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   hoppscotch-aio:
     container_name: hoppscotch-aio
     build:
@@ -32,9 +15,6 @@ services:
       - ENABLE_SUBPATH_BASED_ACCESS=true
     env_file:
       - ./.env
-    depends_on:
-      hoppscotch-db:
-        condition: service_healthy
     command: ["sh", "-c", "pnpm exec prisma migrate deploy && node /usr/src/app/aio_run.mjs"]
     healthcheck:
       test:
